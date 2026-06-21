@@ -53,7 +53,7 @@ export default function AdminPage() {
   }, [supabase]);
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-lg flex-col px-5 pb-24 pt-12 sm:pt-20">
+    <main className="mx-auto flex min-h-screen w-full max-w-lg flex-col px-5 pb-24 pt-16 sm:pt-20">
       <motion.p
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}

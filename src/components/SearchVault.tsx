@@ -107,7 +107,7 @@ export function SearchVault() {
   const hasResults = results.length > 0;
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-2xl flex-col px-5 pb-28 pt-10 sm:pt-16">
+    <main className="mx-auto flex min-h-screen w-full max-w-2xl flex-col px-5 pb-28 pt-16">
       <motion.p
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}

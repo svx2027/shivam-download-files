@@ -38,9 +38,11 @@ anyone can search + download (no accounts). Stack: Next.js + TypeScript + Tailwi
 
 ## Deployment (live)
 - **Repo:** https://github.com/svx2027/shivam-download-files (private, branch `main`). Pushing to `main` auto-deploys on Vercel.
-- **Vercel:** team `svx2028`, project `shivam-download-files`. **Live placeholder → https://shivam-download-files.vercel.app**
-- Deployment-specific `*-svx2028.vercel.app` URLs are 401 (Vercel Deployment Protection); the production alias above is public.
-- Custom domain `files.shivamvashisth.com` NOT connected yet → Phase 6 (add CNAME at GoDaddy → Vercel).
+- **Vercel:** team `svx2028`, project `shivam-download-files`. **LIVE (real search app, not placeholder) → https://shivam-download-files.vercel.app**
+- ✅ **Deployed & verified in production** (commit `75edc85`, redeploy `AthjL47r5`): homepage renders search, 6 files load from Supabase, download route returns signed/redirect URLs (HTTP 200). Build had failed first because env vars were missing (createBrowserClient throws at build during `/admin` prerender) → fixed by adding the 3 keys in Vercel + redeploy.
+- ✅ **Vercel env vars set** (Production+Preview): `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` (not sensitive), `SUPABASE_SERVICE_ROLE_KEY` (Sensitive). Local `.env` only drives `npm run dev`; Vercel needs its own copy.
+- ✅ **Custom domain `files.shivamvashisth.com` LIVE over HTTPS** — GoDaddy CNAME `files → 1314bac51be4e628.vercel-dns-017.com`; Vercel "Valid Configuration"; SSL cert issued (~6 min after connect). Verified: HTTPS 200, serves the vault, download route 200. The main-site Files pill now opens it.
+- **the-toolshed (main site, shivamvashisth.com):** LIVE with header **Files** pill → files.shivamvashisth.com, **Garage** CTA glow+shine, and **mobile header** fix (brand → "SV" under 640px, nav single-line). Commits `89ceaf4`, `9cba751`.
 
 ## Key decisions
 - Location: `~/code/shivam-download-files` for now (T7 offline). Target later: `/Volumes/t7-denzen/code_external/personal/`.

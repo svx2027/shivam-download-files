@@ -26,6 +26,19 @@ export default function RootLayout({
     >
       <body className="min-h-full">
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <a
+          href="https://shivamvashisth.com"
+          aria-label="Back to shivamvashisth.com"
+          className="fixed left-4 top-4 z-50 inline-flex items-center gap-1.5 rounded-full border border-line bg-card/70 px-3 py-1.5 text-sm font-medium text-ink-soft shadow-sm backdrop-blur transition-colors hover:border-line-strong hover:text-ink"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M15 18l-6-6 6-6" />
+          </svg>
+          <span className="font-display font-semibold leading-none">
+            <span className="hidden sm:inline">Shivam Vashisth</span>
+            <span className="sm:hidden">SV</span>
+          </span>
+        </a>
         {children}
       </body>
     </html>
