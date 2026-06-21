@@ -1,0 +1,83 @@
+@import "tailwindcss";
+
+/* Dark mode is class-based: `.dark` on <html> (set by the anti-FOUC script in layout.tsx). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ---- Brand: warm paper + ink, pastel accents (matches shivamvashisth.com) ---- */
+:root {
+  --paper: #FCFCFA;
+  --ink: #1C1B1A;
+  --ink-soft: #56524d;
+  --ink-faint: #8b867f;
+  --line: #ece7df;
+  --line-strong: #ddd6cb;
+  --card: #ffffff;
+  --acc-sky: #2f6fae;
+  --acc-mint: #2f8f63;
+  --acc-peach: #c2693a;
+  --acc-lavender: #6d5bb0;
+  --acc-rose: #c25274;
+}
+
+.dark {
+  --paper: #1A1815;
+  --ink: #ECE7DD;
+  --ink-soft: #B6AFA2;
+  --ink-faint: #837C6E;
+  --line: #2E2B25;
+  --line-strong: #423D35;
+  --card: #221F1A;
+  --acc-sky: #84B6E6;
+  --acc-mint: #76C9A2;
+  --acc-peach: #E7A47E;
+  --acc-lavender: #B9ABE8;
+  --acc-rose: #E78EA8;
+}
+
+/* Expose the brand to Tailwind utilities: text-ink, bg-card, border-line, font-display, etc. */
+@theme inline {
+  --color-paper: var(--paper);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-faint: var(--ink-faint);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-card: var(--card);
+  --color-sky: var(--acc-sky);
+  --color-mint: var(--acc-mint);
+  --color-peach: var(--acc-peach);
+  --color-lavender: var(--acc-lavender);
+  --color-rose: var(--acc-rose);
+
+  --font-display: var(--font-fraunces);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains);
+}
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  background-color: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  /* soft pastel-rainbow watercolour wash, like the main site */
+  background-image:
+    radial-gradient(60% 55% at 12% 8%, rgba(230,224,242,.85), transparent 70%),
+    radial-gradient(55% 50% at 92% 10%, rgba(248,226,212,.80), transparent 70%),
+    radial-gradient(55% 55% at 85% 88%, rgba(223,240,230,.80), transparent 72%),
+    radial-gradient(60% 55% at 8% 92%, rgba(220,234,245,.82), transparent 72%);
+  background-attachment: fixed;
+}
+
+.dark body {
+  background-image:
+    radial-gradient(60% 55% at 12% 8%, rgba(120,108,170,.16), transparent 70%),
+    radial-gradient(55% 50% at 92% 10%, rgba(190,120,90,.13), transparent 70%),
+    radial-gradient(55% 55% at 85% 88%, rgba(70,150,120,.13), transparent 72%),
+    radial-gradient(60% 55% at 8% 92%, rgba(80,130,180,.14), transparent 72%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+}
