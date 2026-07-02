@@ -6,20 +6,71 @@ export const runtime = "nodejs";
 
 const BUCKET = "vault-files";
 const PLACEHOLDER = "PASTE_SECRET_KEY_HERE";
-const SIGNED_URL_TTL_SECONDS = 120; // short-lived link, just long enough to click through
+const SIGNED_URL_TTL_SECONDS = 60; // short-lived link, just long enough to click through
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+// No shared/CDN cache may ever retain a response carrying a signed URL.
+const NO_STORE = { "Cache-Control": "private, no-store" } as const;
+function reply(body: unknown, status = 200, extra: Record<string, string> = {}) {
+  return NextResponse.json(body, { status, headers: { ...NO_STORE, ...extra } });
+}
+
+// Best-effort in-memory per-IP rate limit. This is a first speed bump against a
+// scripted flood hitting ONE serverless instance — NOT a hard guarantee across
+// instances. The real backstops are the Supabase/Vercel spend caps and a proper
+// edge limiter (Upstash) if traffic grows. Fails open on any error.
+const WINDOW_MS = 60_000;
+const MAX_PER_WINDOW = 30;
+const hits = new Map<string, { n: number; resetAt: number }>();
+function rateLimited(ip: string): boolean {
+  try {
+    const now = Date.now();
+    const cur = hits.get(ip);
+    if (!cur || now > cur.resetAt) {
+      hits.set(ip, { n: 1, resetAt: now + WINDOW_MS });
+      if (hits.size > 5000) for (const [k, v] of hits) if (now > v.resetAt) hits.delete(k);
+      return false;
+    }
+    cur.n += 1;
+    return cur.n > MAX_PER_WINDOW;
+  } catch {
+    return false;
+  }
+}
+
+function isHttpUrl(u: string | null | undefined): boolean {
+  if (!u) return false;
+  try {
+    const p = new URL(u).protocol;
+    return p === "https:" || p === "http:";
+  } catch {
+    return false;
+  }
+}
 
 // Returns a short-lived download URL for a file row. Links resolve straight to
 // their external URL; stored files get a signed URL minted server-side.
 export async function GET(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
 
+  // Reject malformed ids before touching Supabase (cheap, no info leak).
+  if (!UUID_RE.test(id)) {
+    return reply({ error: "not_found" }, 404);
+  }
+
+  const ip = (req.headers.get("x-forwarded-for") ?? "").split(",")[0].trim() || "unknown";
+  if (rateLimited(ip)) {
+    return reply({ error: "rate_limited" }, 429, { "Retry-After": "60" });
+  }
+
   // Secret key not set yet → file downloads aren't available (links still work).
   const secret = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!secret || secret === PLACEHOLDER) {
-    return NextResponse.json({ error: "storage_not_configured" }, { status: 503 });
+    return reply({ error: "storage_not_configured" }, 503);
   }
 
   const supabase = createAdminClient();
@@ -31,16 +82,20 @@ export async function GET(
     .single();
 
   if (error || !file) {
-    return NextResponse.json({ error: "not_found" }, { status: 404 });
+    return reply({ error: "not_found" }, 404);
   }
 
-  if (file.type === "link" && file.external_url) {
+  if (file.type === "link") {
+    // Only ever hand back http(s) links (defends against javascript:/data: values).
+    if (!isHttpUrl(file.external_url)) {
+      return reply({ error: "not_found" }, 404);
+    }
     await bumpCount(supabase, id);
-    return NextResponse.json({ url: file.external_url });
+    return reply({ url: file.external_url });
   }
 
   if (!file.storage_path) {
-    return NextResponse.json({ error: "no_file" }, { status: 404 });
+    return reply({ error: "no_file" }, 404);
   }
 
   const { data: signed, error: signError } = await supabase.storage
@@ -50,11 +105,11 @@ export async function GET(
     });
 
   if (signError || !signed?.signedUrl) {
-    return NextResponse.json({ error: "sign_failed" }, { status: 404 });
+    return reply({ error: "sign_failed" }, 404);
   }
 
   await bumpCount(supabase, id);
-  return NextResponse.json({ url: signed.signedUrl });
+  return reply({ url: signed.signedUrl });
 }
 
 async function bumpCount(

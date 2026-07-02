@@ -29,9 +29,7 @@ export async function searchFiles(query: string): Promise<FileRow[]> {
   return (data ?? []) as FileRow[];
 }
 
-// Best-effort download counter; must never block or break a download.
-export function registerDownload(id: string): void {
-  void db()
-    .rpc("increment_download_count", { file_id: id })
-    .then(() => undefined, () => undefined);
-}
+// Download counting now happens server-side inside /api/download (which uses
+// the secret key). The browser no longer calls the counter RPC directly — anon
+// EXECUTE on it is revoked in supabase/04_hardening.sql — so it can't be spammed
+// to inflate counts.

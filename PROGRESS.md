@@ -61,10 +61,24 @@ anyone can search + download (no accounts). Stack: Next.js + TypeScript + Tailwi
 - `npm run dev` → open http://localhost:3000
 - `npm run build` → production build check
 
-## Open reminders
-- Enable **Vercel + GitHub 2FA** (pending from the last security review) — re-flag at deploy.
-- **Phase 6:** ship the main site's security headers; CSP needs a nonce for Next's inline scripts (incl. the theme script); widen `connect-src` + `img-src` for `*.supabase.co`. Set **spend caps** on Supabase AND Vercel.
-- **Epic 2 (LATER — remind Shivam before starting):** per-tool subdomains `abc.shivamvashisth.com` + Framer wow on tool pages. Do NOT start without a reminder.
+## Security hardening pass (2026-07-02, adversarially verified)
+Code fixes applied in working tree (NOT yet committed/pushed — auto-deploys on push to main):
+- `next.config.ts` — full security headers + CSP (Supabase-aware connect-src, frame-ancestors none, nosniff, Referrer-Policy, Permissions-Policy, HSTS) + X-Robots-Tag noindex on /admin.
+- `src/app/robots.ts` — new; disallow /admin from crawlers.
+- `src/app/api/download/[id]/route.ts` — UUID validation, best-effort per-IP rate limit (30/min), TTL 120→60s, `Cache-Control: private, no-store`, http(s) guard on link URLs.
+- `src/lib/types.ts` — dropped `storage_path` from browser column select.
+- `src/lib/files.ts` + `src/components/SearchVault.tsx` — removed client-side `registerDownload` (no anon counter RPC from browser); links validated http(s) before `window.open`; counted server-side.
+- `src/app/admin/page.tsx` — validate link scheme http(s) before insert.
+
+⏳ OWNER MUST RUN (I have no Supabase/Vercel/GoDaddy access):
+- **`supabase/04_hardening.sql`** in Supabase SQL editor — re-pins STORAGE policies to the owner uid (fixes the HIGH: bucket was writable by any authenticated user), revokes anon EXECUTE on the counter, adds an external_url http(s) CHECK, and slims `search_files` output.
+- **Supabase dashboard:** turn OFF public sign-ups; enable owner MFA + leaked-password protection; set bucket MIME/size limits; set a **Spend Cap** + egress alerts.
+- **Vercel:** spend/usage alerts. **GitHub/Vercel/GoDaddy/Supabase 2FA.** GitHub branch protection on `main`. GoDaddy domain lock + DNSSEC.
+- Then: `npm run build`, commit, push (deploys), and re-verify headers live + a real file download.
+- Note: `npm audit` shows a moderate PostCSS advisory (build-time, transitive under Next). Do NOT `npm audit fix --force` (it downgrades Next to v9). Accept or add an `overrides` pin.
+
+## Epic 2 (LATER — remind Shivam before starting)
+- Per-tool subdomains `abc.shivamvashisth.com` + Framer wow on tool pages. Do NOT start without a reminder.
 
 ## Phase map
 0 Orient ✅ · 1 Scaffold+deploy ✅ · 2 Supabase backend ✅ · 3 Public vault UI 🟡 (search+browse live & verified; PDF download needs secret key) · 4 Admin upload (owner-only) · 5 Wow polish (Framer + 1 3D moment) · 6 Deploy + domain + headers + caps.

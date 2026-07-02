@@ -163,12 +163,21 @@ function UploadForm({
         .filter(Boolean);
 
       if (mode === "link") {
+        const url = linkUrl.trim();
+        let okScheme = false;
+        try {
+          const proto = new URL(url).protocol;
+          okScheme = proto === "https:" || proto === "http:";
+        } catch {
+          okScheme = false;
+        }
+        if (!okScheme) throw new Error("Link must start with http:// or https://");
         const { error } = await supabase.from("files").insert({
           title: title.trim(),
           description: description.trim() || null,
           type: "link",
           tags: tagArray.length ? tagArray : null,
-          external_url: linkUrl.trim(),
+          external_url: url,
         });
         if (error) throw error;
       } else {

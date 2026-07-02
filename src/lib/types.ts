@@ -15,7 +15,8 @@ export interface FileRow {
   created_at: string;
 }
 
-// Columns to select for the public list/search (everything except the internal
-// search_tsv vector, which isn't useful in the browser).
+// Columns exposed to the browser. storage_path and search_tsv are intentionally
+// omitted — the browser never needs the internal object path (the download API
+// resolves it server-side from the id), and leaking it is needless disclosure.
 export const FILE_COLUMNS =
-  "id,title,description,type,tags,storage_path,external_url,mime_type,size_bytes,download_count,created_at";
+  "id,title,description,type,tags,external_url,mime_type,size_bytes,download_count,created_at";

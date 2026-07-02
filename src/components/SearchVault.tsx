@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { searchFiles, registerDownload } from "@/lib/files";
+import { searchFiles } from "@/lib/files";
 import type { FileRow } from "@/lib/types";
 import { ResultCard } from "@/components/ResultCard";
 
@@ -78,9 +78,22 @@ export function SearchVault() {
   const handleDownload = useCallback(
     async (file: FileRow) => {
       if (file.type === "link" && file.external_url) {
-        registerDownload(file.id);
+        // Only open http(s) links (guards against javascript:/data: values).
+        let safe = false;
+        try {
+          const proto = new URL(file.external_url).protocol;
+          safe = proto === "https:" || proto === "http:";
+        } catch {
+          safe = false;
+        }
+        if (!safe) {
+          showToast("Sorry — that link isn’t available.");
+          return;
+        }
         bumpCount(file.id);
         window.open(file.external_url, "_blank", "noopener,noreferrer");
+        // Record the click server-side (fire-and-forget; no anon RPC from the browser).
+        void fetch(`/api/download/${file.id}`).catch(() => {});
         return;
       }
       try {
