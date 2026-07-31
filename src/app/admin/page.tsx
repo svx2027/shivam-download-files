@@ -228,7 +228,7 @@ function UploadForm({
 
       <Field label="Title">
         <input required value={title} onChange={(e) => setTitle(e.target.value)} className={inputClass}
-          placeholder={mode === "file" ? "CAT 2024 Quant Formula Sheet" : "Rodha: Full CAT Quant Playlist"} />
+          placeholder={mode === "file" ? "CAT 2024 Quant Formula Sheet" : "Khan Academy: Full Algebra Playlist"} />
       </Field>
 
       <Field label="Description (optional, helps search)">

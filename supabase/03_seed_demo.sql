@@ -33,7 +33,8 @@ $$;
 -- 2) Clear any prior demo rows so re-running never duplicates.
 delete from public.files
 where storage_path like 'demo/%'
-   or external_url in ('https://www.youtube.com/@Rodha', 'https://www.shivamvashisth.com');
+   or external_url like 'https://www.youtube.com/@%'
+   or external_url = 'https://www.shivamvashisth.com';
 
 -- 3) Demo rows. 'link' rows work end to end now (Open follows external_url).
 --    'pdf'/'doc' rows are searchable now; their Download lights up once you
@@ -61,10 +62,10 @@ values
    'demo/mba-intro-template.docx', null,
    'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 48000),
 
-  ('Rodha: Full CAT Quant Playlist',
-   'The complete free quant course on YouTube, in order.',
-   'link', array['cat','quant','video','playlist'],
-   null, 'https://www.youtube.com/@Rodha', null, null),
+  ('Khan Academy: Full Algebra Playlist',
+   'The complete free algebra course on YouTube, in order.',
+   'link', array['algebra','maths','video','playlist'],
+   null, 'https://www.youtube.com/@khanacademy', null, null),
 
   ('Percentile Predictor (live page)',
    'Enter your mock scores, get an estimated percentile band.',
