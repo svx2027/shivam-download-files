@@ -12,7 +12,9 @@ one link forever.
 - **Search**: Postgres full-text search (generated `tsvector` column + GIN
   index) layered with `pg_trgm` word similarity, so partial words and typos
   still find the file. One `search_files()` SQL function does keyword, substring,
-  and fuzzy ranking in a single pass (`supabase/03_seed_demo.sql`).
+  and fuzzy ranking in a single pass (`supabase/01_schema.sql`,
+  narrowed in `supabase/04_hardening.sql`). Design writeup:
+  [`docs/SEARCH.md`](docs/SEARCH.md).
 - **Downloads**: never a raw storage URL. A server route validates the UUID,
   rate-limits by hashed IP, mints a short-TTL signed URL, and bumps a download
   counter via a `SECURITY DEFINER` RPC (`src/app/api/download`).
