@@ -42,3 +42,10 @@ Supabase setup lives in `supabase/` as ordered SQL files (schema, storage
 policies, demo seed, hardening); run them in the Supabase SQL editor in order.
 Environment keys are documented in the deployment notes; no service-role key is
 used anywhere in the app.
+
+## Related tools
+
+- [the-toolshed](https://github.com/svx2027/the-toolshed): the other live web
+  product — a personal site plus a shed of tiny share-first web tools.
+
+Full index of all public repos: [github.com/svx2027](https://github.com/svx2027).
