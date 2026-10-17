@@ -43,6 +43,19 @@ policies, demo seed, hardening); run them in the Supabase SQL editor in order.
 Environment keys are documented in the deployment notes; no service-role key is
 used anywhere in the app.
 
+## Honest scope
+
+- No CI workflow in this repo yet — build and lint run locally, not gated on
+  every push or PR the way its sibling repos in this portfolio are.
+- No automated test suite; the hardening pass in `PROGRESS.md` was verified
+  by hand against the live Supabase policies, not by a repeatable test run.
+- Single-owner admin, no multi-user accounts, no audit trail beyond the
+  download counter — "only the owner can upload" is an RLS guarantee, not a
+  reviewable permissions model.
+- Signed URLs are short-TTL, but there's no malware/virus scanning on
+  uploads — the model assumes the owner is the only uploader and trusts
+  what they upload.
+
 ## Related tools
 
 - [the-toolshed](https://github.com/svx2027/the-toolshed): the other live web
